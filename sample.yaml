@@ -1,0 +1,54 @@
+maps:
+ -
+  value: amount
+  date: date
+  group: vendor
+ -
+  value: amount
+  date:
+   type: date
+   field: date
+  group: vendor
+ -
+  0: amount
+  1: date
+  2: vendor
+
+records:
+ -
+  amount: 12131.12
+  date: 2014-07-01
+  vendor: v234234
+ -
+  amount: 1000.00
+  date: 2014/08/01
+  vendor: 1231
+ -
+  name: chethiya
+  age: 27
+  address: 23A, Ella way, Kurunegala
+  school: Maliyadeva College
+ -
+  name: gangani
+  age: 26
+  address: homagama
+  school: Devi Balika
+ -
+  name: tharaka
+  age: 33
+  address:  02342, Oman
+  school: "\"Maliyadeva College\""
+ - {}
+ -
+  meta:
+   dataset: 'employee'
+ -
+  one: 1
+  two: 1
+ -
+  one:
+   two:
+    three:
+     four:
+      five: 5
+
