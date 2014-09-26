@@ -10,10 +10,24 @@ maps:
    field: date
   group: vendor
  -
+  value: amount
+  date:
+   type: date
+   field: date
+   split:
+    regex: '[\,\/]'
+    index: [2, 1, 0]
+  group: vendor
+ -
   0: amount
   1: date
   2: vendor
-
+ -
+  changedName:
+   type: replace
+   field: name
+   regex: ['ga', 'gi']
+   newValue: 'GA'
 records:
  -
   amount: 12131.12
@@ -24,12 +38,16 @@ records:
   date: 2014/08/01
   vendor: 1231
  -
+  amount: 1000.00
+  date: '01,01,2014'
+  vendor: 1231
+ -
   name: chethiya
   age: 27
   address: 23A, Ella way, Kurunegala
   school: Maliyadeva College
  -
-  name: gangani
+  name: Gangani
   age: 26
   address: homagama
   school: Devi Balika
