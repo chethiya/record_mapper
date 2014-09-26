@@ -62,7 +62,8 @@ oper =
  replace: (context, key) ->
   f = (record) ->
    v = getField record, @field
-   if 'string' is typeof v
+   if 'object' isnt typeof v
+    v = "#{v}"
     return v.replace @regex, @newValue
    else
     return v
