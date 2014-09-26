@@ -28,6 +28,22 @@ maps:
    field: name
    regex: ['ga', 'gi']
    newValue: 'GA'
+ -
+  vendorType:
+   type: switch
+   field: vendor
+   selects:
+    -
+     select: ['^0*1', ['^0*a', 'i']]
+     value: 'Small Digit'
+    -
+     select: ['^0*9']
+     value: 'Large Digit'
+    -
+     select: ['^H']
+     value: 'Custom start'
+   default: Other
+
 records:
  -
   amount: 12131.12
@@ -36,16 +52,18 @@ records:
  -
   amount: 1000.00
   date: 2014/08/01
-  vendor: 1231
+  vendor: '01231' # starting with 0 means base-8
  -
   amount: 1000.00
   date: '01,01,2014'
-  vendor: 1231
+  vendor: 00900A9231
  -
   name: chethiya
   age: 27
   address: 23A, Ella way, Kurunegala
   school: Maliyadeva College
+  vendor: 000A9231
+
  -
   name: Gangani
   age: 26

@@ -75,6 +75,29 @@ oper =
    throw "Invalid newValue given for map #{key}"
   return f.bind context
 
+ switch: (context, key) ->
+  f = (record) ->
+   v = getField record, @field
+   for s in @selects
+    for regex in s.select
+     if regex.test v
+      return s.value
+   return @default
+
+  if context.selects?
+   if not context.selects instanceof Array
+    throw "selects need to be an array in map #{key}"
+   for s, i in context.selects
+    if not s.select? or not s.select instanceof Array
+     throw "Invalid select (index - #{i}) in map #{key}"
+    for r, j in s.select
+     try
+      s.select[j] = createRegex r
+     catch
+      throw "Invalid regex #{r} in map #{key}"
+
+  return f.bind context
+
 compile = (config) ->
  len = 0
  for k of config
@@ -107,6 +130,8 @@ compile = (config) ->
     maps[k] = oper.date context, k
    else if context.type is 'replace'
     maps[k] = oper.replace context, k
+   else if context.type is 'switch'
+    maps[k] = oper.switch context, k
    else
     throw "Unsupported mapping type #{context.type} in map #{k}"
 
