@@ -98,6 +98,16 @@ oper =
 
   return f.bind context
 
+ number: (context, key) ->
+  f = (record) ->
+   v = getField record, @field
+   if v?
+    v = parseFloat v
+    if not isNaN v
+     return v
+   return null
+  return f.bind context
+
 compile = (config) ->
  len = 0
  for k of config
@@ -132,6 +142,8 @@ compile = (config) ->
     maps[k] = oper.replace context, k
    else if context.type is 'switch'
     maps[k] = oper.switch context, k
+   else if context.type is 'number'
+    maps[k] = oper.number context, k
    else
     throw "Unsupported mapping type #{context.type} in map #{k}"
 
