@@ -102,10 +102,19 @@ oper =
   f = (record) ->
    v = getField record, @field
    if v?
+    if typeof v is 'string' and @removeRegex?
+     v = v.replace @removeRegex, ''
     v = parseFloat v
     if not isNaN v
      return v
    return null
+
+  if context.removeRegex?
+   try
+    context.removeRegex = createRegex context.removeRegex
+   catch
+    throw new Error "Invalid regex given for map #{key}"
+
   return f.bind context
 
 compile = (config) ->
