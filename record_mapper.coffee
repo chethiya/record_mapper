@@ -21,7 +21,7 @@ createRegex = (r) ->
  else if 'string' is typeof r
   return new RegExp r
  else
-  throw "Invalid Regexp #{r}"
+  throw new Error "Invalid Regexp #{r}"
 
 oper =
  map: (context) ->
@@ -50,13 +50,13 @@ oper =
     try
      context.split.regex = createRegex context.split.regex
     catch
-     throw "Invalid regex given for map #{key}"
+     throw new Error "Invalid regex given for map #{key}"
    else
     context.split.regex = /[\.\-\/\\]/
    if not context.split.index?
-    throw "Date split index is not given for map #{key}"
+    throw new Error "Date split index is not given for map #{key}"
    if not context.split.index instanceof Array or context.split.index.length isnt 3
-    throw "Date split index is not an array of length 3 for map #{key}"
+    throw new Error "Date split index is not an array of length 3 for map #{key}"
   return f.bind context
 
  replace: (context, key) ->
@@ -70,9 +70,9 @@ oper =
   try
    context.regex = createRegex context.regex
   catch
-   throw "Invalid regex given for map #{key}"
+   throw new Error "Invalid regex given for map #{key}"
   if not context.newValue? or 'string' isnt typeof context.newValue
-   throw "Invalid newValue given for map #{key}"
+   throw new Error "Invalid newValue given for map #{key}"
   return f.bind context
 
  switch: (context, key) ->
@@ -86,15 +86,15 @@ oper =
 
   if context.selects?
    if not context.selects instanceof Array
-    throw "selects need to be an array in map #{key}"
+    throw new Error "selects need to be an array in map #{key}"
    for s, i in context.selects
     if not s.select? or not s.select instanceof Array
-     throw "Invalid select (index - #{i}) in map #{key}"
+     throw new Error "Invalid select (index - #{i}) in map #{key}"
     for r, j in s.select
      try
       s.select[j] = createRegex r
      catch
-      throw "Invalid regex #{r} in map #{key}"
+      throw new Error "Invalid regex #{r} in map #{key}"
 
   return f.bind context
 
@@ -126,9 +126,9 @@ compile = (config) ->
    maps[k] = oper.map field: createField v
   else
    if not v.field? or 'string' isnt typeof v.field
-    throw "No/invalid field given for map #{k}"
+    throw new Error "The field #{k} has no/invalid mapping field"
    if not v.type? or 'string' isnt typeof v.type
-    throw "No/invalid mapping type given for map #{k}"
+    throw new Error "The field #{k} has no/invalid mapping type"
 
    context = {}
    context[key] = val for key, val of v
@@ -145,7 +145,7 @@ compile = (config) ->
    else if context.type is 'number'
     maps[k] = oper.number context, k
    else
-    throw "Unsupported mapping type #{context.type} in map #{k}"
+    throw new Error "The field #{k} has Unsupported mapping type #{context.type}"
 
  console.log 'created maping: ', maps
  mapFunc = (record) ->
