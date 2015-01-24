@@ -8,7 +8,7 @@ maps = o.maps
 records = o.records
 
 for m in maps
- console.log "========= Compile <D-k>MAP ========"
+ console.log "========= Compile MAP ========"
  console.log m
  console.log '----------------------'
  map = RecordMapper.compile m

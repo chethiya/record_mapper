@@ -4,7 +4,10 @@ maps:
   date: date
   group: vendor
  -
-  value: amount
+  value:
+   type: number
+   field: amount
+   removeRegex: [',', 'g']
   date:
    type: date
    field: date
@@ -58,6 +61,7 @@ records:
   date: '01,01,2014'
   vendor: 00900A9231
  -
+  amount: "1,423,978.53"
   name: chethiya
   age: 27
   address: 23A, Ella way, Kurunegala
