@@ -46,6 +46,12 @@ maps:
      select: ['^H']
      value: 'Custom start'
    default: Other
+ -
+  dataset: meta.dataset
+  val: one.two.three.four.five
+  meta.dataset: meta.dataset
+  userInfo.0: name
+  userInfo.1: age
 
 records:
  -

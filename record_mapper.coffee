@@ -6,12 +6,25 @@ getField = (record, field) ->
  else
   return record[field]
 
+setField = (record, field, val) ->
+ if record?
+  if field instanceof Array
+   for i in [0...field.length-1]
+    record[field[i]] ?= {}
+    record = record[field[i]]
+   record[field[field.length-1]] = val
+  else
+   record[field] = val
+
 createField = (str) ->
- arr = str.split '.'
- if arr.length is 1
-  return str
+ if 'string' is typeof str
+  arr = str.split '.'
+  if arr.length is 1
+   return str
+  else
+   return arr
  else
-  return arr
+  return str
 
 createRegex = (r) ->
  if r instanceof RegExp
@@ -131,8 +144,11 @@ compile = (config) ->
   maps = new Array len
 
  for k, v of config
+  maps[k] =
+   oper: null
+   keyField: createField k
   if typeof v is 'string'
-   maps[k] = oper.map field: createField v
+   maps[k].oper = oper.map field: createField v
   else
    if not v.field? or 'string' isnt typeof v.field
     throw new Error "The field #{k} has no/invalid mapping field"
@@ -144,15 +160,15 @@ compile = (config) ->
 
    context.field = createField context.field
    if context.type is 'map'
-    maps[k] = oper.map context, k
+    maps[k].oper = oper.map context, k
    else if context.type is 'date'
-    maps[k] = oper.date context, k
+    maps[k].oper = oper.date context, k
    else if context.type is 'replace'
-    maps[k] = oper.replace context, k
+    maps[k].oper = oper.replace context, k
    else if context.type is 'switch'
-    maps[k] = oper.switch context, k
+    maps[k].oper = oper.switch context, k
    else if context.type is 'number'
-    maps[k] = oper.number context, k
+    maps[k].oper = oper.number context, k
    else
     throw new Error "The field #{k} has Unsupported mapping type #{context.type}"
 
@@ -162,8 +178,8 @@ compile = (config) ->
    res = {}
   else
    res = new Array len
-  for k, f of @maps
-   res[k] = f record
+  for k, map of @maps
+   setField res, map.keyField, map.oper record
   return res
 
  return mapFunc.bind maps: maps

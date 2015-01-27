@@ -9,8 +9,8 @@ records = o.records
 
 for m in maps
  console.log "========= Compile MAP ========"
- console.log m
+ console.log JSON.stringify m
  console.log '----------------------'
  map = RecordMapper.compile m
  for r, i in records
-  console.log "Record #{i}: ", map r
+  console.log "Record #{i}: ", JSON.stringify map r
