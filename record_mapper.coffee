@@ -43,6 +43,11 @@ oper =
   f = (record) ->
    getField record, @field
   return f.bind context
+
+ const: (context) ->
+  f = (record) -> @value
+  return f.bind context
+
  date: (context, key) ->
   f = (record) ->
    v = getField record, @field
@@ -152,10 +157,12 @@ compile = (config, options) ->
   if typeof v is 'string'
    maps[k].oper = oper.map field: createField v
   else
-   if not v.field? or 'string' isnt typeof v.field
-    throw new Error "The field #{k} has no/invalid mapping field"
    if not v.type? or 'string' isnt typeof v.type
     throw new Error "The field #{k} has no/invalid mapping type"
+   if v.type is 'const' and not v.value?
+    throw new Error "The field #{k} has no constant value given"
+   else if v.type isnt 'const' and not v.field?
+    throw new Error "The field #{k} has no mapping field"
 
    context = {}
    context[key] = val for key, val of v
@@ -163,6 +170,8 @@ compile = (config, options) ->
    context.field = createField context.field
    if context.type is 'map'
     maps[k].oper = oper.map context, k
+   if context.type is 'const'
+    maps[k].oper = oper.const context, k
    else if context.type is 'date'
     maps[k].oper = oper.date context, k
    else if context.type is 'replace'

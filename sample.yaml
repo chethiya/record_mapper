@@ -52,6 +52,13 @@ maps:
   meta.dataset: meta.dataset
   userInfo.0: name
   userInfo.1: age
+  constValue:
+   type: const
+   value:
+    - 234
+    -
+     a: 1
+     b: 2
 
 records:
  -
