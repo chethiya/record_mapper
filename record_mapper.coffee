@@ -1,3 +1,5 @@
+_ = (require? 'underscore')?._
+
 getField = (record, field) ->
  if field instanceof Array
   v = record
@@ -130,7 +132,7 @@ oper =
 
   return f.bind context
 
-compile = (config) ->
+compile = (config, options) ->
  len = 0
  for k of config
   if (typeof k is 'number' and k is parseInt k) or (typeof k is 'string' and (parseInt k) is (parseFloat k) and not isNaN parseInt k)
@@ -172,18 +174,19 @@ compile = (config) ->
    else
     throw new Error "The field #{k} has Unsupported mapping type #{context.type}"
 
- console.log 'created maping: ', maps
  mapFunc = (record) ->
-  if len is -1
-   res = {}
+  if options? and options.clone is on and _?
+   res = _.clone record
   else
-   res = new Array len
+   if len is -1
+    res = {}
+   else
+    res = new Array len
   for k, map of @maps
    setField res, map.keyField, map.oper record
   return res
 
  return mapFunc.bind maps: maps
-
 
 #direct map.
 map = (conf, record) ->
