@@ -1,5 +1,9 @@
 _ = (require? 'underscore')?._
 
+TYPE_MAP = 0
+TYPE_ARRAY = 1
+TYPE_LITERAL = 2
+
 getField = (record, field) ->
  if field instanceof Array
   v = record
@@ -8,11 +12,16 @@ getField = (record, field) ->
  else
   return record[field]
 
-setField = (record, field, val) ->
+setField = (record, field, val, fieldMap) ->
  if record?
   if field instanceof Array
    for i in [0...field.length-1]
-    record[field[i]] ?= {}
+    fieldMap = fieldMap.keys[field[i]]
+    if not record[field[i]]?
+     if fieldMap.type is TYPE_MAP
+      record[field[i]] = {}
+     else if fieldMap.type is TYPE_ARRAY
+      record[field[i]] = new Array fieldMap.arrayLength
     record = record[field[i]]
    record[field[field.length-1]] = val
   else
@@ -21,12 +30,66 @@ setField = (record, field, val) ->
 createField = (str) ->
  if 'string' is typeof str
   arr = str.split '.'
-  if arr.length is 1
-   return str
-  else
-   return arr
+  for v, i in arr
+   val = parseInt v
+   if not isNaN val
+    arr[i] = val
+  return arr
  else
   return str
+
+createFieldMap = (keys) ->
+ fields = []
+ for k in keys
+  fields.push createField k
+ fields.sort (a, b) ->
+  l = Math.min a.length, b.length
+  for i in [0...l]
+   if a[i] isnt b[i]
+    if (typeof a) is (typeof b)
+     return a < b
+    else if 'number' is typeof a
+     return 1
+    else
+     return -1
+  return 0
+
+ res =
+  type: TYPE_ARRAY
+  arrayLength: 0
+  keys: {}
+ last = []
+ for f in fields
+  m = res
+  min = Math.min last.length, f.length
+  start = 0
+  found = off
+  for i in [0...min]
+   if last[i] isnt f[i]
+    start = i
+    found = on
+    break
+   m = m.keys[f[i]]
+  last = f
+  if found is off
+   start = min
+   if f.length > start and m.type is TYPE_LITERAL
+    m.type = TYPE_ARRAY
+    m.arrayLength = 0
+
+  for i in [start...f.length]
+   if m.type is TYPE_ARRAY and ('number' is typeof f[i])
+    m.arrayLength++
+   else
+    m.type = TYPE_MAP
+   nextType = TYPE_ARRAY
+   nextType = TYPE_LITERAL if i is f.length-1
+   m.keys[f[i]] =
+    type: nextType
+    arrayLength: 0
+    keys: {}
+   m = m.keys[f[i]]
+ return res
 
 createRegex = (r) ->
  if r instanceof RegExp
@@ -150,6 +213,9 @@ compile = (config, options) ->
  else
   maps = new Array len
 
+ keys = (k for k of config)
+ fieldMap = createFieldMap keys
+
  for k, v of config
   maps[k] =
    oper: null
@@ -183,16 +249,19 @@ compile = (config, options) ->
    else
     throw new Error "The field #{k} has Unsupported mapping type #{context.type}"
 
+ options ?= {}
+ options.clone = off unless _?
+
  mapFunc = (record) ->
-  if options? and options.clone is on and _?
+  if options.clone is on
    res = _.clone record
   else
-   if len is -1
+   if fieldMap.type is TYPE_MAP
     res = {}
-   else
-    res = new Array len
+   else if fieldMap.type is TYPE_ARRAY
+    res = new Array fieldMap.arrayLength
   for k, map of @maps
-   setField res, map.keyField, map.oper record
+   setField res, map.keyField, (map.oper record), fieldMap
   return res
 
  return mapFunc.bind maps: maps
