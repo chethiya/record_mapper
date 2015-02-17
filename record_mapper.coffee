@@ -250,11 +250,12 @@ compile = (config, options) ->
     throw new Error "The field #{k} has Unsupported mapping type #{context.type}"
 
  options ?= {}
- options.clone = off unless _?
 
  mapFunc = (record) ->
   if options.clone is on
    res = _.clone record
+  else if options.sameObject is on
+   res = record
   else
    if fieldMap.type is TYPE_MAP
     res = {}
