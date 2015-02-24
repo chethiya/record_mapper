@@ -138,7 +138,7 @@ oper =
     context.split.regex = /[\.\-\/\\]/
    if not context.split.index?
     throw new Error "Date split index is not given for map #{key}"
-   if not context.split.index instanceof Array or context.split.index.length isnt 3
+   if not (context.split.index instanceof Array) or context.split.index.length isnt 3
     throw new Error "Date split index is not an array of length 3 for map #{key}"
   return f.bind context
 
@@ -168,10 +168,10 @@ oper =
    return @default
 
   if context.selects?
-   if not context.selects instanceof Array
+   if not (context.selects instanceof Array)
     throw new Error "selects need to be an array in map #{key}"
    for s, i in context.selects
-    if not s.select? or not s.select instanceof Array
+    if not s.select? or not (s.select instanceof Array)
      throw new Error "Invalid select (index - #{i}) in map #{key}"
     for r, j in s.select
      try
