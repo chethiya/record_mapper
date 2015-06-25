@@ -200,6 +200,17 @@ oper =
 
   return f.bind context
 
+ sum: (context, key) ->
+  f = (record) ->
+   res = 0
+   for f in @fields
+    v = getField record, f
+    if not isNaN v
+     res += v
+   return res
+  context.fields ?= []
+  return f.bind context
+
 compile = (config, options) ->
  len = 0
  for k of config
@@ -227,13 +238,22 @@ compile = (config, options) ->
     throw new Error "The field #{k} has no/invalid mapping type"
    if v.type is 'const' and not v.value?
     throw new Error "The field #{k} has no constant value given"
-   else if v.type isnt 'const' and not v.field?
-    throw new Error "The field #{k} has no mapping field"
+   else if v.type is 'sum'
+    if not v.fields?
+     throw new Error "Fields is not mapped in #{k}"
+   else if v.type isnt 'const'
+    if not v.field?
+     throw new Error "The field #{k} has no mapping field"
 
    context = {}
    context[key] = val for key, val of v
 
-   context.field = createField context.field
+   if context.field?
+    context.field = createField context.field
+   else if context.fields?
+    for f, i in context.fields
+     context.fields[i] = createField f
+
    if context.type is 'map'
     maps[k].oper = oper.map context, k
    if context.type is 'const'
@@ -246,6 +266,8 @@ compile = (config, options) ->
     maps[k].oper = oper.switch context, k
    else if context.type is 'number'
     maps[k].oper = oper.number context, k
+   else if context.type is 'sum'
+    maps[k].oper = oper.sum context, k
    else
     throw new Error "The field #{k} has Unsupported mapping type #{context.type}"
 
