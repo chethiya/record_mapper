@@ -4,6 +4,12 @@ TYPE_MAP = 0
 TYPE_ARRAY = 1
 TYPE_LITERAL = 2
 
+twoDigit = (d) ->
+ if d < 10
+  "0#{d}"
+ else
+  "#{d}"
+
 getField = (record, field) ->
  if field instanceof Array
   v = record
@@ -114,19 +120,34 @@ oper =
  date: (context, key) ->
   f = (record) ->
    v = getField record, @field
+   res = null
    if v instanceof Date
-    return v
+    res = v
    else if typeof v is 'string'
     if @split?
-     arr = v.split @split.regex
+     arr = null
+     if @split.regex?
+      arr = v.split @split.regex
+     else if @split.lengths?
+      arr = []
+      start = 0
+      for l in @split.lengths
+       arr.push v.substr start, l
+       start += l
      yy = parseInt arr[@split.index[0]]
      mm = parseInt arr[@split.index[1]] - 1
      dd = parseInt arr[@split.index[2]]
-     return new Date yy, mm, dd
+     res = new Date yy, mm, dd
     else
-     return new Date v
+     res = new Date v
    else
-    return null
+    res = null
+
+   if res? and @return?.type? and @return.type is 'string'
+    return "#{res.getYear()+1900}#{@return.separator}#{twoDigit res.getMonth()+1}" +
+    "#{@return.separator}#{twoDigit res.getDate()}"
+   else
+    return res
 
   if context.split?
    if context.split.regex?
@@ -134,7 +155,7 @@ oper =
      context.split.regex = createRegex context.split.regex
     catch
      throw new Error "Invalid regex given for map #{key}"
-   else
+   else if not context.split.lengths?
     context.split.regex = /[\.\-\/\\]/
    if not context.split.index?
     throw new Error "Date split index is not given for map #{key}"
