@@ -232,6 +232,19 @@ oper =
   context.fields ?= []
   return f.bind context
 
+ concat: (context, key) ->
+  f = (record) ->
+   res = ''
+   for f, i in @fields
+    if i > 0
+     res += @separator
+    res += getField record, f
+   return res
+  context.separator ?= '|'
+  context.fields ?= []
+  return f.bind context
+
+
 compile = (config, options) ->
  len = 0
  for k of config
@@ -259,9 +272,9 @@ compile = (config, options) ->
     throw new Error "The field #{k} has no/invalid mapping type"
    if v.type is 'const' and not v.value?
     throw new Error "The field #{k} has no constant value given"
-   else if v.type is 'sum'
+   else if v.type is 'sum' or v.type is 'concat'
     if not v.fields?
-     throw new Error "Fields is not mapped in #{k}"
+     throw new Error "Fields are not mapped in #{k}"
    else if v.type isnt 'const'
     if not v.field?
      throw new Error "The field #{k} has no mapping field"
@@ -289,6 +302,8 @@ compile = (config, options) ->
     maps[k].oper = oper.number context, k
    else if context.type is 'sum'
     maps[k].oper = oper.sum context, k
+   else if context.type is 'concat'
+    maps[k].oper = oper.concat context, k
    else
     throw new Error "The field #{k} has Unsupported mapping type #{context.type}"
 
