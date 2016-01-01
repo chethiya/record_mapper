@@ -1,5 +1,3 @@
-_ = (require? 'underscore')?._
-
 TYPE_MAP = 0
 TYPE_ARRAY = 1
 TYPE_LITERAL = 2
@@ -311,7 +309,14 @@ compile = (config, options) ->
 
  mapFunc = (record) ->
   if options.clone is on
-   res = _.clone record
+   if record instanceof Array
+    res = []
+    for item in record
+     res.push item
+   else
+    res = {}
+    for k, v of record
+     res[k] = v
   else if options.sameObject is on
    res = record
   else
