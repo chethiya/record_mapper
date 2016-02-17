@@ -140,7 +140,7 @@ oper =
      res = new Date "#{yy}-#{mm}-#{dd}"
     else
      res = new Date v
-   if typeof v is 'number'
+   else if typeof v is 'number'
     res = new Date v
    else
     res = null
