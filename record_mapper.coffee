@@ -135,9 +135,8 @@ oper =
      yy = parseInt arr[@split.index[0]]
      mm = parseInt arr[@split.index[1]]
      dd = parseInt arr[@split.index[2]]
-     # Time is 00:00 in UTC this way.
-     # TODO Z can be used at the end of the string below
-     res = new Date "#{yy}-#{mm}-#{dd}"
+     # Time is 00:00 in UTC
+     res = new Date Date.UTC yy, mm, dd
     else
      res = new Date v
    else if typeof v is 'number'
