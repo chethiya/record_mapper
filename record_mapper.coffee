@@ -136,7 +136,7 @@ oper =
      mm = parseInt arr[@split.index[1]]
      dd = parseInt arr[@split.index[2]]
      # Time is 00:00 in UTC
-     res = new Date Date.UTC yy, mm, dd
+     res = new Date Date.UTC yy, mm-1, dd
     else
      res = new Date v
    else if typeof v is 'number'
