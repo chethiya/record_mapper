@@ -145,8 +145,8 @@ oper =
     res = null
 
    if res? and @return?.type? and @return.type is 'string'
-    return "#{res.getYear()+1900}#{@return.separator}#{twoDigit res.getMonth()+1}" +
-    "#{@return.separator}#{twoDigit res.getDate()}"
+    return "#{res.getUTCFullYear()}#{@return.separator}#{twoDigit res.getUTCMonth()+1}" +
+    "#{@return.separator}#{twoDigit res.getUTCDate()}"
    else
     return res
 
