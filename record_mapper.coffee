@@ -135,6 +135,8 @@ oper =
      yy = parseInt arr[@split.index[0]]
      mm = parseInt arr[@split.index[1]]
      dd = parseInt arr[@split.index[2]]
+     if @split.century?
+      yy += @split.century
      # Time is 00:00 in UTC
      res = new Date Date.UTC yy, mm-1, dd
     else
