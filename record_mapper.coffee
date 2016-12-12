@@ -247,6 +247,42 @@ oper =
   context.fields ?= []
   return f.bind context
 
+ split: (context, key) ->
+  f = (record) ->
+   v = getField record, @field
+   res = null
+   if 'string' isnt typeof v
+    res = v
+   else
+    arr = null
+    if @regex?
+     arr = v.split @regex
+    else if @lengths?
+     arr = []
+     start = 0
+     for l in @lengths
+      arr.push v.substr start, l
+      start += l
+
+    if @return? and @return.type is 'string'
+     res = arr.join @return.separator
+    else
+     res = arr
+   return res
+
+  if context.regex?
+   try
+    context.regex = createRegex context.regex
+   catch
+    throw new Error "Invalid regex given for map #{key}"
+  else if not context.lengths?
+   context.regex = /[\.\-\/\\\s]/
+
+  context.return ?= type: 'string'
+  if context.return?.type is 'string'
+   context.return.separator ?= ','
+
+  return f.bind context
 
 compile = (config, options) ->
  len = 0
@@ -307,6 +343,8 @@ compile = (config, options) ->
     maps[k].oper = oper.sum context, k
    else if context.type is 'concat'
     maps[k].oper = oper.concat context, k
+   else if context.type is 'split'
+    maps[k].oper = oper.split context, k
    else
     throw new Error "The field #{k} has Unsupported mapping type #{context.type}"
 
