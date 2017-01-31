@@ -229,10 +229,33 @@ oper =
    res = 0
    for f in @fields
     v = getField record, f
+    v = parseFloat v
+    if not isNaN v
+     res += v
+   for v in @consts
+    v = parseFloat v
     if not isNaN v
      res += v
    return res
   context.fields ?= []
+  context.consts ?= []
+  return f.bind context
+
+ multiply: (context, key) ->
+  f = (record) ->
+   res = 1
+   for f in @fields
+    v = getField record, f
+    v = parseFloat v
+    if not isNaN v
+     res *= v
+   for v in @consts
+    v = parseFloat v
+    if not isNaN v
+     res *= v
+   return res
+  context.fields ?= []
+  context.consts ?= []
   return f.bind context
 
  concat: (context, key) ->
