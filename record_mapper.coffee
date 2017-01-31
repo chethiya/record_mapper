@@ -334,7 +334,7 @@ compile = (config, options) ->
     throw new Error "The field #{k} has no/invalid mapping type"
    if v.type is 'const' and not v.value?
     throw new Error "The field #{k} has no constant value given"
-   else if v.type is 'sum' or v.type is 'concat'
+   else if v.type is 'sum' or v.type is 'multiply' or v.type is 'concat'
     if not v.fields?
      throw new Error "Fields are not mapped in #{k}"
    else if v.type isnt 'const'
@@ -364,12 +364,14 @@ compile = (config, options) ->
     maps[k].oper = oper.number context, k
    else if context.type is 'sum'
     maps[k].oper = oper.sum context, k
+   else if context.type is 'multiply'
+    maps[k].oper = oper.multiply context, k
    else if context.type is 'concat'
     maps[k].oper = oper.concat context, k
    else if context.type is 'split'
     maps[k].oper = oper.split context, k
    else
-    throw new Error "The field #{k} has Unsupported mapping type #{context.type}"
+    throw new Error "The field #{k} has unsupported mapping type #{context.type}"
 
  options ?= {}
 
